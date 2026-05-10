@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cali anonymous</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics-compat.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="firebase.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="rail" aria-label="Primary">
+        <a class="brand" href="#" aria-label="Cali anonymous home">
+          <span class="brand-mark">CA</span>
+          <span>Cali anonymous</span>
+        </a>
+
+        <nav class="nav-list">
+          <button class="nav-item active" type="button" data-nav="feed">
+            <i data-lucide="house"></i>
+            <span>Feed</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="hot">
+            <i data-lucide="flame"></i>
+            <span>Hot</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="gallery">
+            <i data-lucide="image"></i>
+            <span>Gallery</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="comments">
+            <i data-lucide="message-circle"></i>
+            <span>Comments</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="settings">
+            <i data-lucide="settings-2"></i>
+            <span>Settings</span>
+          </button>
+        </nav>
+
+        <section class="identity-panel" aria-label="Anonymous profile">
+          <div class="avatar glitch">?</div>
+          <div>
+            <p class="eyebrow">Signed in as</p>
+            <strong>Anonymous Wave</strong>
+          </div>
+        </section>
+      </aside>
+
+      <main class="feed-column">
+        <header class="topbar">
+          <button class="icon-button menu-button" type="button" aria-label="Open menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <label class="search-field">
+            <i data-lucide="search"></i>
+            <input id="searchInput" type="search" placeholder="Search whispers, photos, places" />
+          </label>
+          <button class="icon-button" id="notificationsButton" type="button" aria-label="Notifications">
+            <i data-lucide="bell"></i>
+          </button>
+        </header>
+
+        <section class="stories" aria-label="Anonymous circles">
+          <button class="story add-story" type="button">
+            <span><i data-lucide="plus"></i></span>
+            <strong>Post</strong>
+          </button>
+          <button class="story" type="button">
+            <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=220&q=80" alt="" />
+            <strong>Beach fog</strong>
+          </button>
+          <button class="story" type="button">
+            <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=220&q=80" alt="" />
+            <strong>Afterparty</strong>
+          </button>
+          <button class="story" type="button">
+            <img src="https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=220&q=80" alt="" />
+            <strong>Roommates</strong>
+          </button>
+          <button class="story" type="button">
+            <img src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=220&q=80" alt="" />
+            <strong>City late</strong>
+          </button>
+        </section>
+
+        <section class="composer" aria-label="Create anonymous post">
+          <div class="composer-head">
+            <div class="avatar">CA</div>
+            <div>
+              <p class="eyebrow">Anonymous post</p>
+              <strong>Drop a thought, photo, or confession</strong>
+            </div>
+          </div>
+          <textarea id="postText" maxlength="260" placeholder="What is happening in Cali tonight?"></textarea>
+          <div id="firebaseStatus" class="firebase-status connecting">
+            <i data-lucide="loader"></i>
+            <span>Connecting to Firebase</span>
+          </div>
+          <div id="firebaseHelp" class="firebase-help" hidden></div>
+          <div id="imagePreview" class="image-preview" hidden></div>
+          <div class="composer-actions">
+            <label class="tool-button">
+              <i data-lucide="image-plus"></i>
+              <span>Photo</span>
+              <input id="photoInput" type="file" accept="image/*" />
+            </label>
+            <button class="tool-button" id="moodButton" type="button">
+              <i data-lucide="sparkles"></i>
+              <span>Mood</span>
+            </button>
+            <span class="character-count"><span id="charCount">0</span>/260</span>
+            <button class="post-button" id="publishButton" type="button">
+              <i data-lucide="send"></i>
+              <span>Post</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="filter-tabs" aria-label="Feed filters">
+          <button class="active" data-filter="all" type="button">All</button>
+          <button data-filter="photos" type="button">Photos</button>
+          <button data-filter="confessions" type="button">Confessions</button>
+          <button data-filter="local" type="button">Local</button>
+        </section>
+
+        <section id="feed" class="feed" aria-live="polite"></section>
+      </main>
+
+      <aside class="pulse-panel" aria-label="Cali anonymous pulse">
+        <section class="pulse-hero">
+          <p class="eyebrow">Tonight's pulse</p>
+          <h1>Cali anonymous</h1>
+          <p>Photos, stories, and comments without names attached.</p>
+          <div class="pulse-meter" aria-label="Community heat 82 percent">
+            <span style="width: 82%"></span>
+          </div>
+        </section>
+
+        <section class="trend-list">
+          <div class="section-title">
+            <h2>Trending</h2>
+            <i data-lucide="trending-up"></i>
+          </div>
+          <button type="button">#sunsetconfessions <span>2.4k</span></button>
+          <button type="button">#lateafterwork <span>936</span></button>
+          <button type="button">#hiddenfoodspots <span>801</span></button>
+          <button type="button">#needadvice <span>512</span></button>
+        </section>
+
+        <section class="signal-card">
+          <div class="section-title">
+            <h2>Live signal</h2>
+            <i data-lucide="radio"></i>
+          </div>
+          <div class="signal-grid">
+            <span><strong>8.7k</strong> online</span>
+            <span><strong>412</strong> new posts</span>
+            <span><strong>91%</strong> anonymous</span>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <div class="comment-drawer" id="commentDrawer" aria-hidden="true">
+      <div class="drawer-backdrop" data-close-comments></div>
+      <section class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+        <header class="drawer-header">
+          <div>
+            <p class="eyebrow">Thread</p>
+            <h2 id="drawerTitle">Anonymous comments</h2>
+          </div>
+          <button class="icon-button" type="button" aria-label="Close comments" data-close-comments>
+            <i data-lucide="x"></i>
+          </button>
+        </header>
+        <article id="drawerPost" class="drawer-post"></article>
+        <div id="drawerComments" class="drawer-comments"></div>
+        <form id="drawerCommentForm" class="drawer-comment-form">
+          <input name="comment" autocomplete="off" maxlength="140" placeholder="Add an anonymous comment" />
+          <button type="submit" aria-label="Send comment"><i data-lucide="send"></i></button>
+        </form>
+      </section>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <button class="active" type="button" aria-label="Feed" data-mobile-nav="feed"><i data-lucide="house"></i></button>
+      <button type="button" aria-label="Hot" data-mobile-nav="hot"><i data-lucide="flame"></i></button>
+      <button type="button" aria-label="Create" data-mobile-nav="create"><i data-lucide="plus"></i></button>
+      <button type="button" aria-label="Comments" data-mobile-nav="comments"><i data-lucide="message-circle"></i></button>
+      <button type="button" aria-label="Profile" data-mobile-nav="settings"><i data-lucide="circle-user-round"></i></button>
+    </nav>
+  </body>
+</html>

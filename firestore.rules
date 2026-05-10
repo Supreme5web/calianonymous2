@@ -1,0 +1,70 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function validPost() {
+      return request.resource.data.keys().hasOnly([
+        'alias',
+        'time',
+        'category',
+        'mood',
+        'text',
+        'image',
+        'likes',
+        'commentCount',
+        'ownerId',
+        'createdAt',
+        'updatedAt'
+      ])
+      && request.resource.data.ownerId == request.auth.uid
+      && request.resource.data.text is string
+      && request.resource.data.text.size() <= 260
+      && request.resource.data.image is string
+      && request.resource.data.image.size() <= 850000
+      && request.resource.data.likes == 0
+      && request.resource.data.commentCount == 0
+      && request.resource.data.createdAt == request.time
+      && request.resource.data.updatedAt == request.time;
+    }
+
+    function validComment() {
+      return request.resource.data.keys().hasOnly([
+        'postId',
+        'text',
+        'alias',
+        'ownerId',
+        'createdAt'
+      ])
+      && request.resource.data.ownerId == request.auth.uid
+      && request.resource.data.text is string
+      && request.resource.data.text.size() <= 140
+      && request.resource.data.createdAt is string;
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if signedIn() && validPost();
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'likes',
+          'commentCount',
+          'updatedAt'
+        ])
+        && request.resource.data.likes >= 0
+        && request.resource.data.commentCount >= 0
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if signedIn() && validComment();
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+    }
+  }
+}
