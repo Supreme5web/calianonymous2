@@ -45,9 +45,10 @@ export function setComposerAuthState(user, profile) {
   const actions  = document.querySelector(".composer-actions");
   const gate     = document.getElementById("composerGate");
 
-  if (user && profile) {
-    if (avatar)  avatar.textContent  = profile.username.slice(0, 2).toUpperCase();
-    if (eyebrow) eyebrow.textContent = `@${profile.username}`;
+  if (user) {
+    const displayName = profile?.username || user.email?.split("@")[0] || "user";
+    if (avatar)  avatar.textContent  = displayName.slice(0, 2).toUpperCase();
+    if (eyebrow) eyebrow.textContent = `@${displayName}`;
     if (label)   label.textContent   = "What's on your mind?";
     if (textarea) textarea.disabled  = false;
     if (actions)  actions.hidden     = false;
@@ -68,13 +69,16 @@ export function renderUserRail(user, profile, onLogout) {
   const container = document.getElementById("railUser");
   if (!container) return;
 
-  if (user && profile) {
+  if (user) {
+    // Fallback to email prefix if Firestore profile doc doesn't exist yet
+    const displayName = profile?.username || user.email?.split("@")[0] || "user";
+    const initials    = displayName.slice(0, 2).toUpperCase();
     container.innerHTML = `
       <div class="rail-user">
-        <div class="avatar rail-avatar">${escapeHtml(profile.username.slice(0, 2).toUpperCase())}</div>
+        <div class="avatar rail-avatar">${escapeHtml(initials)}</div>
         <div class="rail-user-info">
-          <strong>@${escapeHtml(profile.username)}</strong>
-          <span class="post-time">${escapeHtml(user.email)}</span>
+          <strong>@${escapeHtml(displayName)}</strong>
+          <span class="post-time">${escapeHtml(user.email || "")}</span>
         </div>
         <button class="icon-button logout-btn" title="Log out" id="logoutBtn">
           <i data-lucide="log-out"></i>
