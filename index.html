@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cali Anonymous</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-family='Arial' font-size='24' font-weight='900' fill='%231d9bf0'%3ECA%3C/text%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="auth.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="rail" aria-label="Primary navigation">
+        <a class="brand" href="#" aria-label="Cali Anonymous home">
+          <span class="brand-mark">CA</span>
+          <span>Cali Anonymous</span>
+        </a>
+        <nav class="nav-list">
+          <button class="nav-item active" type="button" data-nav="feed"><i data-lucide="house"></i><span>Feed</span></button>
+          <button class="nav-item" type="button" data-nav="hot"><i data-lucide="flame"></i><span>Hot</span></button>
+          <button class="nav-item" type="button" data-nav="gallery"><i data-lucide="image"></i><span>Gallery</span></button>
+          <button class="nav-item" type="button" data-nav="comments"><i data-lucide="message-circle"></i><span>Comments</span></button>
+        </nav>
+        <div id="railUser"></div>
+      </aside>
+
+      <main class="feed-column">
+        <header class="topbar">
+          <button class="icon-button menu-button" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+          <a class="top-title" href="#" data-nav="feed" aria-label="Home"><span class="brand-mark">CA</span><strong>Cali Anonymous</strong></a>
+          <label class="search-field">
+            <i data-lucide="search"></i>
+            <input id="searchInput" type="search" placeholder="Search posts…" autocomplete="off" />
+          </label>
+        </header>
+
+        <section class="composer" aria-label="Create post">
+          <div class="composer-head">
+            <div class="avatar">CA</div>
+            <div>
+              <p class="eyebrow">Anonymous</p>
+              <strong>Sign in to post</strong>
+            </div>
+          </div>
+          <div id="composerGate">
+            <span>Join the conversation anonymously.</span>
+            <div class="gate-btns">
+              <button class="tool-button" type="button" id="gateLoginBtn">Log in</button>
+              <button class="post-button" type="button" id="gateSignupBtn">Sign up</button>
+            </div>
+          </div>
+          <textarea id="postText" maxlength="260" placeholder="What's on your mind?" disabled></textarea>
+          <div id="connectionStatus" class="connection-status connecting">
+            <i data-lucide="loader"></i><span>Connecting to live feed</span>
+          </div>
+          <div id="imagePreview" class="image-preview" hidden></div>
+          <div class="composer-actions" hidden>
+            <label class="tool-button" title="Add photo">
+              <i data-lucide="image-plus"></i><span>Photo</span>
+              <input id="photoInput" type="file" accept="image/*" />
+            </label>
+            <span class="character-count"><span id="charCount">0</span>/260</span>
+            <button class="post-button" id="publishButton" type="button">
+              <i data-lucide="send"></i><span>Post</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="filter-tabs" aria-label="Feed filters">
+          <button class="active" data-filter="all" type="button">For you</button>
+          <button data-filter="photos" type="button">Photos</button>
+          <button data-filter="confessions" type="button">Confessions</button>
+          <button data-filter="local" type="button">Local</button>
+        </section>
+
+        <section id="feed" class="feed" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <button class="sidebar-backdrop" type="button" aria-label="Close menu"></button>
+
+    <div class="comment-drawer" id="commentDrawer" aria-hidden="true">
+      <div class="drawer-backdrop" data-close-comments></div>
+      <section class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+        <header class="drawer-header">
+          <div><p class="eyebrow">Thread</p><h2 id="drawerTitle">Comments</h2></div>
+          <button class="icon-button" type="button" aria-label="Close" data-close-comments><i data-lucide="x"></i></button>
+        </header>
+        <article id="drawerPost" class="drawer-post"></article>
+        <div id="drawerComments" class="drawer-comments"></div>
+        <form id="drawerCommentForm" class="drawer-comment-form">
+          <input name="comment" autocomplete="off" maxlength="140" placeholder="Sign in to comment" disabled />
+          <button type="submit" aria-label="Send" disabled><i data-lucide="send"></i></button>
+        </form>
+      </section>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <button class="active" type="button" aria-label="Feed" data-mobile-nav="feed"><i data-lucide="house"></i></button>
+      <button type="button" aria-label="Hot" data-mobile-nav="hot"><i data-lucide="flame"></i></button>
+      <button type="button" aria-label="Create" data-mobile-nav="create"><i data-lucide="plus-circle"></i></button>
+      <button type="button" aria-label="Comments" data-mobile-nav="comments"><i data-lucide="message-circle"></i></button>
+    </nav>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        window.lucide?.createIcons();
+        document.getElementById("gateLoginBtn")?.addEventListener("click", () => {
+          import("./ui.js").then(({ showAuthModal }) => showAuthModal("login"));
+        });
+        document.getElementById("gateSignupBtn")?.addEventListener("click", () => {
+          import("./ui.js").then(({ showAuthModal }) => showAuthModal("signup"));
+        });
+      });
+    </script>
+  </body>
+</html>
