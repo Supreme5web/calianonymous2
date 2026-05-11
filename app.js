@@ -284,6 +284,7 @@ async function publishPost() {
     id: crypto.randomUUID(),
     alias: createAlias(),
     time: "now",
+    mood: "lowkey",
     category: selectedImage ? "photos" : "confessions",
     text: text || "Shared a photo anonymously.",
     image: selectedImage,
